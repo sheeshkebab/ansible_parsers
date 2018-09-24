@@ -18,6 +18,11 @@
       with_lines: /usr/bin/head -1 ./ansible.csv
 
 
+# In this step, we are going to loop over each row in 'lines'
+# combine is an inbuilt filter that will join what gets returned
+# from the custom csvzip filter.
+# The csvzip filter is simple, it combines two lists into a key,value list.
+
     - name: Create dictionary
       set_fact:
         input_lines: "{{ input_lines | combine( { item.split(',')[0]: headings | csvzip(item.split(',')) } ) }}"
