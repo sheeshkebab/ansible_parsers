@@ -18,10 +18,11 @@
       with_lines: /usr/bin/head -1 ./ansible.csv
 
 
-# In this step, we are going to loop over each row in 'lines'
-# combine is an inbuilt filter that will join what gets returned
-# from the custom csvzip filter.
-# The csvzip filter is simple, it combines two lists into a key,value list.
+# In this step, we use with_items to loop over each row in the 'lines' list of array.
+# combine is an inbuilt filter that will hash together two lists.
+# https://docs.ansible.com/ansible/2.6/user_guide/playbooks_filters.html#combining-hashes-dictionaries
+# our two lists are the column headings and the values.
+# The custom csvzip filter creates the two lists.
 
     - name: Create dictionary
       set_fact:
