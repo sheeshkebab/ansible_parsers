@@ -23,7 +23,7 @@ curl http://localhost:5000/inventory/keys
 curl http://localhost:5000/inventory/<serial_number>/ip
 ```
 
-the json format / data structure will be stored from .csv into this format below
+Example of the json data structure after it is converted from .csv format
 
 ```
     SGHY833WB": {
