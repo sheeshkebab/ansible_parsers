@@ -1,0 +1,21 @@
+---
+- name : Query inventory API 
+  hosts: localhost
+  connection: local
+  gather_facts: False
+  ignore_errors: yes
+  vars:
+
+  tasks:
+    - name: Query our local Microservice
+      uri: 
+        url: http://localhost:5000/inventory
+        method: GET
+        body_format: json
+      register: api_result
+
+
+    - name: Print the IP details of each item within the JSON object
+      debug: 
+        msg: "{{ api_result.json[item].ip }}"
+      with_items: "{{ api_result.json }}"

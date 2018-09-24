@@ -1,0 +1,53 @@
+---
+- name : Create Inventory from .csv
+  hosts: localhost
+  connection: local
+  gather_facts: False
+  ignore_errors: yes
+
+  vars:
+    contents: "{{ lookup('file', './ansible.csv') }}"
+    lines: "{{ contents.split('\n') }}"
+    input_lines: {} 
+    headings: []
+
+  tasks:
+    - name: Get .csv headings 
+      set_fact: 
+        headings: "{{ item.split(',') }}"
+      with_lines: /usr/bin/head -1 ./ansible.csv
+
+
+    - name: Create dictionary
+      set_fact:
+        input_lines: "{{ input_lines | combine( { item.split(',')[0]: headings | csvzip(item.split(',')) } ) }}"
+      with_items: "{{ lines }}"
+
+
+    - debug: 
+        var: item | tojson
+        #msg: "{{ item.value.fqdn }} {{ item.value.ip }} {{ item.value.default_password}}"
+      with_dict: "{{ input_lines }}"
+
+
+    - name: Add the host to inventory and group created_nodes
+      add_host: 
+        name: "{{ item.value.ip }}"
+        groups: created_nodes
+        ansible_user: root 
+        instance_name: "{{ item.value.ip }}"
+      with_dict: "{{ input_lines }}"
+      when: item.value.ip != 'ip'
+
+
+    - name: Show all the inventory that matches pattern created_nodes group
+      debug:
+        msg: "{{ item }}"
+      with_inventory_hostnames:
+        - created_nodes
+
+
+    - name: Dump the inventory to file
+      template:
+        src: templates/dumpall.j2
+        dest: microservice/database/inventory.json
